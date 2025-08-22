@@ -16,7 +16,7 @@ class Load(QThread):
 
   def run(self, /):
     with ZipFile(self.path, 'r') as arch:
-      for path in arch.namelist()[:6]:
+      for path in arch.namelist():
         if path.endswith('/'):
           continue
         img_data = arch.read(path)

@@ -24,14 +24,10 @@ class MainView(QMainWindow):
     self.ui.action_open.triggered.connect(self.file_open)
     self.ui.save_button.clicked.connect(self.save)
 
-    # TODO remove
-    # self.thread = Load('/data/home/Programming/python/BiggerEyes/Battle Angel Alita Vol. 08 (2017, New Translation Edition) (digital) (Minutemen-Excelsior).cbz')
-    # self.thread.page_ready.connect(self.update_pages)
-    # self.thread.start()
-    # self.thread.finished.connect(lambda : self.ui.save_button.setEnabled(True))
-
   def file_open(self):
     file_name = QFileDialog.getOpenFileName(self, "Select comic", "", "Comic files (*.cbz)")
+    if not file_name[0]:
+      return
     self.dir_path = os.path.dirname(file_name[0])
     self.ui.pages_list_view.model().elements.clear()
     self.thread = Load(file_name[0])
@@ -42,6 +38,8 @@ class MainView(QMainWindow):
 
   def save(self):
     file_name = QFileDialog.getSaveFileName(self, "Save comic", self.dir_path, "Comic files (*.cbz)")
+    if not file_name[0]:
+      return
     if not file_name[0].endswith('.cbz'):
       file_name[0] += '.cbz'
 

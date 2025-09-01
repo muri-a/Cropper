@@ -16,11 +16,9 @@ class PageDelegate(QStyledItemDelegate):
     if not index.isValid():
       return
     img: Image = index.model().data(index, Qt.DisplayRole)
-    rect = option.rect
-    # image = index.data(Qt.DisplayRole)
     if not img:
-      print('NOT')
       return
+    rect = option.rect
     if not img.thumb:
       img.thumb = img.qimg.scaled(rect.width(), rect.height(), Qt.KeepAspectRatio)
     x = rect.x() + (rect.width() - img.thumb.width()) / 2

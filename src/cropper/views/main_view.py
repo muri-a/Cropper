@@ -50,8 +50,10 @@ class MainView(QMainWindow):
     for img in self.ui.pages_list_view.model().elements:
       img_dir_path = os.path.join(dir_path, os.path.dirname(img.path))
       os.makedirs(img_dir_path, exist_ok=True)
+      img.load_qimg()
       copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
       copy.save(os.path.join(dir_path, img.path))
+      img.clear()
 
     os.chdir(dir_path) # So ZipFile works properly
     with ZipFile(file_name[0], 'w') as zip:

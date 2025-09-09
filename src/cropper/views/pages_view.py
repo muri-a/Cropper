@@ -19,20 +19,19 @@ class PageDelegate(QStyledItemDelegate):
     if not img:
       return
     rect = option.rect
-    if not img.thumb:
-      img.thumb = img.qimg.scaled(rect.width(), rect.height(), Qt.KeepAspectRatio)
+
     x = rect.x() + (rect.width() - img.thumb.width()) / 2
     y = rect.y() + (rect.height() - img.thumb.height()) / 2
     painter.drawImage(QPoint(x, y), img.thumb)
     # Draw margins
-    l = img.left * img.thumb.width() / img.qimg.width()
+    l = img.left * img.thumb.width() / img.width
     # x, y, width, height
     painter.fillRect(x, y, l, img.thumb.height(), self.margin_color)
-    r = (img.qimg.width() - img.right) * img.thumb.width() / img.qimg.width()
+    r = (img.width - img.right) * img.thumb.width() / img.width
     painter.fillRect(1 + x + img.thumb.width() - r, y, r, img.thumb.height(), self.margin_color)
 
   def sizeHint(self, option: QStyleOptionViewItem, index: Union[QModelIndex, QPersistentModelIndex]) -> QSize:
-    return QSize(200, 250)
+    return Image.ThumbnailSize
 
 
 class PagesModel(QAbstractListModel):
@@ -79,7 +78,9 @@ class PagesView(QListView):
   def open_full_view(self, index: QModelIndex):
     if not index.isValid():
       return
-    image = index.data()
+    image: Image = index.data()
     if image:
+      image.load_qimg()
       dialog = FullPageDialog(self, image)
       dialog.open()
+      image.clear()

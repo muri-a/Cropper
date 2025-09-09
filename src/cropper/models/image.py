@@ -1,21 +1,26 @@
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QImage
 
 
 class Image:
-  def __init__(self, qimg: QImage, path: str):
-    self.qimg = qimg
+  ThumbnailSize = QSize(200, 250)
+
+  def __init__(self, data: bytes, path: str):
+    self.data: bytes = data
+    self.qimg = QImage.fromData(data)
     self.path = path
-    self.thumb = None
+    self.thumb = self.qimg.scaled(Image.ThumbnailSize, Qt.KeepAspectRatio)
     self.left = 0
-    self.right = qimg.width()
-
-  @property
-  def width(self):
-    return self.qimg.width()
-
-  @property
-  def height(self):
-    return self.qimg.height()
+    self.right = self.qimg.width() - 1
+    self.width = self.qimg.width()
+    self.height = self.qimg.height()
 
   def __repr__(self):
-    return f'{self.qimg.width()}x{self.qimg.height()} {self.left}:{self.right}'
+    return f'{self.width}x{self.height} {self.left}:{self.right}'
+
+  def load_qimg(self):
+    self.qimg = QImage.fromData(self.data)
+
+  # Remove qimg to save RAM
+  def clear(self):
+    del self.qimg

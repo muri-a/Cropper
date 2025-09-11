@@ -37,11 +37,11 @@ class MainView(QMainWindow):
     self.thread.finished.connect(lambda: self.ui.save_button.setEnabled(True))
 
   def save(self):
-    file_name = QFileDialog.getSaveFileName(self, "Save comic", self.dir_path, "Comic files (*.cbz)")
-    if not file_name[0]:
+    file_name = QFileDialog.getSaveFileName(self, "Save comic", self.dir_path, "Comic files (*.cbz)")[0]
+    if not file_name:
       return
-    if not file_name[0].endswith('.cbz'):
-      file_name[0] += '.cbz'
+    if not file_name.endswith('.cbz'):
+      file_name += '.cbz'
 
     dir_path = os.path.join(gettempdirb().decode(), 'cropper_' + str(uuid4()))
     while os.path.exists(dir_path): # if somehow already exists, generate new one
@@ -54,7 +54,7 @@ class MainView(QMainWindow):
       copy.save(os.path.join(dir_path, img.path))
 
     os.chdir(dir_path) # So ZipFile works properly
-    with ZipFile(file_name[0], 'w') as zip:
+    with ZipFile(file_name, 'w') as zip:
       for root, directories, files in os.walk(dir_path):
         for file in files:
           zip.write(os.path.join(os.path.split(root)[-1], file))

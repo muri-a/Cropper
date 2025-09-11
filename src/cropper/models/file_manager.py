@@ -98,7 +98,10 @@ class Save(QThread):
       img_dir_path = os.path.join(dir_path, os.path.dirname(img.path))
       os.makedirs(img_dir_path, exist_ok=True)
       copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
-      copy.save(os.path.join(dir_path, img.path))
+      if img.path.lower().endswith('jpg') or img.path.lower().endswith('jpeg'):
+        copy.save(os.path.join(dir_path, img.path), format='JPG', quality=95)
+      else:
+        copy.save(os.path.join(dir_path, img.path))
 
     os.chdir(dir_path)  # So ZipFile works properly
     with ZipFile(self.path, 'w') as zip:

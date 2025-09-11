@@ -1,8 +1,13 @@
+import os
+import shutil
 from math import floor
+from tempfile import gettempdirb
+from typing import List
+from uuid import uuid4
+from zipfile import ZipFile
 
 from PySide6.QtCore import QThread, Signal
-from PySide6.QtGui import QImage, QColor
-from zipfile import ZipFile
+from PySide6.QtGui import QImage
 
 from cropper.models.image import Image
 
@@ -73,3 +78,32 @@ class Load(QThread):
 
     img.left = left
     img.right = right
+
+
+class Save(QThread):
+  def __init__(self, path: str, images: List[Image]):
+    super().__init__()
+    self.path = path
+    self.images = images
+
+  def run(self):
+    if not self.path.endswith('.cbz'):
+      self.path += '.cbz'
+
+    dir_path = os.path.join(gettempdirb().decode(), 'cropper_' + str(uuid4()))
+    while os.path.exists(dir_path):  # if somehow already exists, generate new one
+      dir_path = os.path.join(gettempdirb().decode(), 'cropper_' + str(uuid4()))
+    os.makedirs(dir_path)
+    for img in self.images:
+      img_dir_path = os.path.join(dir_path, os.path.dirname(img.path))
+      os.makedirs(img_dir_path, exist_ok=True)
+      copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
+      copy.save(os.path.join(dir_path, img.path))
+
+    os.chdir(dir_path)  # So ZipFile works properly
+    with ZipFile(self.path, 'w') as zip:
+      for root, directories, files in os.walk(dir_path):
+        for file in files:
+          zip.write(os.path.join(os.path.split(root)[-1], file))
+    shutil.rmtree(dir_path, ignore_errors=True)
+    self.finished.emit()

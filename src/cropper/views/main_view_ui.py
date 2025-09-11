@@ -17,16 +17,20 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QHeaderView,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+    QLabel, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
+    QVBoxLayout, QWidget)
 
-from cropper.views.pages_view import PagesView
+from views.pages_view import PagesView
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(990, 652)
+        MainWindow.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
+        MainWindow.setAnimated(True)
+        MainWindow.setTabShape(QTabWidget.TabShape.Rounded)
         self.action_open = QAction(MainWindow)
         self.action_open.setObjectName(u"action_open")
         self.action_exit = QAction(MainWindow)
@@ -62,6 +66,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
+        self.saving_label = QLabel(self.centralwidget)
+        self.saving_label.setObjectName(u"saving_label")
+
+        self.horizontalLayout.addWidget(self.saving_label)
+
         self.save_button = QPushButton(self.centralwidget)
         self.save_button.setObjectName(u"save_button")
         self.save_button.setEnabled(False)
@@ -92,7 +101,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Bigger Eyes", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Cropper", None))
         self.action_open.setText(QCoreApplication.translate("MainWindow", u"Open", None))
 #if QT_CONFIG(shortcut)
         self.action_open.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
@@ -102,6 +111,7 @@ class Ui_MainWindow(object):
         self.action_exit.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Q", None))
 #endif // QT_CONFIG(shortcut)
         self.spoiler_cb.setText(QCoreApplication.translate("MainWindow", u"Spoiler mode", None))
+        self.saving_label.setText(QCoreApplication.translate("MainWindow", u"saving...", None))
         self.save_button.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi

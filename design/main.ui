@@ -11,7 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Bigger Eyes</string>
+   <string>Cropper</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+  </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::TabShape::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -58,6 +67,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="saving_label">
+          <property name="text">
+           <string>saving...</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="save_button">

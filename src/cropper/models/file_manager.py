@@ -27,8 +27,9 @@ class Load(QThread):
         img_data = arch.read(path)
         if not img_data:
           continue
-        img = Image(QImage.fromData(img_data), path)
+        img = Image(img_data, path)
         self.set_margins(img)
+        img.clear()
         self.page_ready.emit(img)
     self.finished.emit()
 

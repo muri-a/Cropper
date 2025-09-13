@@ -31,7 +31,6 @@ class Load(QThread):
         self.set_margins(img)
         img.clear()
         self.page_ready.emit(img)
-    self.finished.emit()
 
   # direction: 1 left margin, -1 right margin
   def margin(self, qimg: QImage, direction: int) -> int:
@@ -98,13 +97,18 @@ class Save(QThread):
     for img in self.images:
       img_dir_path = os.path.join(dir_path, os.path.dirname(img.path))
       os.makedirs(img_dir_path, exist_ok=True)
-      img.load_qimg()
-      copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
-      if img.path.lower().endswith('jpg') or img.path.lower().endswith('jpeg'):
-        copy.save(os.path.join(dir_path, img.path), format='JPG', quality=95)
+
+      if img.left == 0 and img.right == img.width - 1:
+        with open(os.path.join(dir_path, img.path), 'wb') as file:
+          file.write(img.data)
       else:
-        copy.save(os.path.join(dir_path, img.path))
-      img.clear()
+        img.load_qimg()
+        copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
+        if img.path.lower().endswith('jpg') or img.path.lower().endswith('jpeg'):
+          copy.save(os.path.join(dir_path, img.path), format='JPG', quality=95)
+        else:
+          copy.save(os.path.join(dir_path, img.path))
+        img.clear()
 
     os.chdir(dir_path)  # So ZipFile works properly
     with ZipFile(self.path, 'w') as zip:
@@ -112,4 +116,3 @@ class Save(QThread):
         for file in files:
           zip.write(os.path.join(os.path.split(root)[-1], file))
     shutil.rmtree(dir_path, ignore_errors=True)
-    self.finished.emit()

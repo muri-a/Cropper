@@ -23,4 +23,4 @@ class Image:
 
   # Remove qimg to save RAM
   def clear(self):
-    del self.qimg
+    self.qimg = None

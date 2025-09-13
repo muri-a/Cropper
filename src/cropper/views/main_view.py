@@ -1,9 +1,4 @@
 import os
-import shutil
-
-from tempfile import gettempdirb
-from uuid import uuid4
-from zipfile import ZipFile
 
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
@@ -53,7 +48,7 @@ class MainView(QMainWindow):
     self.ui.saving_label.setVisible(False)
     self.ui.save_button.setEnabled(True)
     self.ui.action_open.setEnabled(True)
-    del self.thread
+    self.thread = None
 
   def update_pages(self, img):
     model = self.ui.pages_list_view.model()

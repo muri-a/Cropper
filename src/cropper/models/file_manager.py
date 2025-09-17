@@ -1,8 +1,13 @@
+import os
+import shutil
 from math import floor
+from tempfile import gettempdirb
+from typing import List
+from uuid import uuid4
+from zipfile import ZipFile
 
 from PySide6.QtCore import QThread, Signal
-from PySide6.QtGui import QImage, QColor
-from zipfile import ZipFile
+from PySide6.QtGui import QImage
 
 from cropper.models.image import Image
 
@@ -26,7 +31,6 @@ class Load(QThread):
         self.set_margins(img)
         img.clear()
         self.page_ready.emit(img)
-    self.finished.emit()
 
   # direction: 1 left margin, -1 right margin
   def margin(self, qimg: QImage, direction: int) -> int:
@@ -74,3 +78,42 @@ class Load(QThread):
 
     img.left = left
     img.right = right
+
+
+class Save(QThread):
+  def __init__(self, path: str, images: List[Image], quality: int = 95):
+    super().__init__()
+    self.path = path
+    self.images = images
+    self.quality = quality
+
+  def run(self):
+    if not self.path.endswith('.cbz'):
+      self.path += '.cbz'
+
+    dir_path = os.path.join(gettempdirb().decode(), 'cropper_' + str(uuid4()))
+    while os.path.exists(dir_path):  # if somehow already exists, generate new one
+      dir_path = os.path.join(gettempdirb().decode(), 'cropper_' + str(uuid4()))
+    os.makedirs(dir_path)
+    for img in self.images:
+      img_dir_path = os.path.join(dir_path, os.path.dirname(img.path))
+      os.makedirs(img_dir_path, exist_ok=True)
+
+      if img.left == 0 and img.right == img.width - 1:
+        with open(os.path.join(dir_path, img.path), 'wb') as file:
+          file.write(img.data)
+      else:
+        img.load_qimg()
+        copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
+        if img.path.lower().endswith('jpg') or img.path.lower().endswith('jpeg'):
+          copy.save(os.path.join(dir_path, img.path), format='JPG', quality=self.quality)
+        else:
+          copy.save(os.path.join(dir_path, img.path))
+        img.clear()
+
+    os.chdir(dir_path)  # So ZipFile works properly
+    with ZipFile(self.path, 'w') as zip:
+      for root, directories, files in os.walk(dir_path):
+        for file in files:
+          zip.write(os.path.join(os.path.split(root)[-1], file))
+    shutil.rmtree(dir_path, ignore_errors=True)

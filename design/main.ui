@@ -11,7 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Bigger Eyes</string>
+   <string>Cropper</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+  </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::TabShape::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -23,6 +32,30 @@
          <string>Spoiler mode</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="jpg_quality_layout">
+        <item>
+         <widget class="QLabel" name="jpg_quality_label">
+          <property name="text">
+           <string>Jpg quality</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="jpg_quality_box">
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="stepType">
+           <enum>QAbstractSpinBox::StepType::DefaultStepType</enum>
+          </property>
+          <property name="value">
+           <number>95</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -58,6 +91,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="saving_label">
+          <property name="text">
+           <string>saving...</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="save_button">

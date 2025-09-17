@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QHeaderView,
-    QLabel, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QHBoxLayout,
+    QHeaderView, QLabel, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
+    QSpinBox, QTabWidget, QVBoxLayout, QWidget)
 
 from views.pages_view import PagesView
 
@@ -45,6 +45,24 @@ class Ui_MainWindow(object):
         self.spoiler_cb.setObjectName(u"spoiler_cb")
 
         self.verticalLayout.addWidget(self.spoiler_cb)
+
+        self.jpg_quality_layout = QHBoxLayout()
+        self.jpg_quality_layout.setObjectName(u"jpg_quality_layout")
+        self.jpg_quality_label = QLabel(self.centralwidget)
+        self.jpg_quality_label.setObjectName(u"jpg_quality_label")
+
+        self.jpg_quality_layout.addWidget(self.jpg_quality_label)
+
+        self.jpg_quality_box = QSpinBox(self.centralwidget)
+        self.jpg_quality_box.setObjectName(u"jpg_quality_box")
+        self.jpg_quality_box.setMaximum(100)
+        self.jpg_quality_box.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
+        self.jpg_quality_box.setValue(95)
+
+        self.jpg_quality_layout.addWidget(self.jpg_quality_box)
+
+
+        self.verticalLayout.addLayout(self.jpg_quality_layout)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -111,6 +129,7 @@ class Ui_MainWindow(object):
         self.action_exit.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Q", None))
 #endif // QT_CONFIG(shortcut)
         self.spoiler_cb.setText(QCoreApplication.translate("MainWindow", u"Spoiler mode", None))
+        self.jpg_quality_label.setText(QCoreApplication.translate("MainWindow", u"Jpg quality", None))
         self.saving_label.setText(QCoreApplication.translate("MainWindow", u"saving...", None))
         self.save_button.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))

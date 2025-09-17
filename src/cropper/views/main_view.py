@@ -3,6 +3,7 @@ import os
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from cropper.models.file_manager import Load, Save
+from cropper.models.image import Image
 from cropper.views.main_view_ui import Ui_MainWindow
 
 
@@ -19,6 +20,8 @@ class MainView(QMainWindow):
     self.ui.action_open.triggered.connect(self.file_open)
     self.ui.save_button.clicked.connect(self.save)
     self.ui.saving_label.setVisible(False)
+    self.ui.jpg_quality_label.setVisible(False)
+    self.ui.jpg_quality_box.setVisible(False)
 
   def file_open(self):
     file_name = QFileDialog.getOpenFileName(self, "Select comic", "", "Comic files (*.cbz)")
@@ -26,8 +29,10 @@ class MainView(QMainWindow):
       return
     self.dir_path = os.path.dirname(file_name[0])
     self.ui.pages_list_view.model().elements.clear()
-    self.thread = Load(file_name[0])
+    self.ui.jpg_quality_label.setVisible(False)
+    self.ui.jpg_quality_box.setVisible(False)
     self.ui.save_button.setEnabled(False)
+    self.thread = Load(file_name[0])
     self.thread.page_ready.connect(self.update_pages)
     self.thread.start()
     self.thread.finished.connect(lambda: self.ui.save_button.setEnabled(True))
@@ -40,7 +45,7 @@ class MainView(QMainWindow):
     self.ui.save_button.setEnabled(False)
     self.ui.action_open.setEnabled(False)
 
-    self.thread = Save(file_name, self.ui.pages_list_view.model().elements)
+    self.thread = Save(file_name, self.ui.pages_list_view.model().elements, self.ui.jpg_quality_box.value())
     self.thread.finished.connect(self.after_save)
     self.thread.start()
 
@@ -50,7 +55,10 @@ class MainView(QMainWindow):
     self.ui.action_open.setEnabled(True)
     self.thread = None
 
-  def update_pages(self, img):
+  def update_pages(self, img: Image):
     model = self.ui.pages_list_view.model()
     index = model.createIndex(model.rowCount(), 0)
     self.ui.pages_list_view.model().setData(index, img)
+    if img.path.endswith('jpg') or img.path.endswith('jpeg'):
+      self.ui.jpg_quality_label.setVisible(True)
+      self.ui.jpg_quality_box.setVisible(True)

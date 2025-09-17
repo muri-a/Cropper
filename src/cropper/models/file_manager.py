@@ -81,10 +81,11 @@ class Load(QThread):
 
 
 class Save(QThread):
-  def __init__(self, path: str, images: List[Image]):
+  def __init__(self, path: str, images: List[Image], quality: int = 95):
     super().__init__()
     self.path = path
     self.images = images
+    self.quality = quality
 
   def run(self):
     if not self.path.endswith('.cbz'):
@@ -105,7 +106,7 @@ class Save(QThread):
         img.load_qimg()
         copy = img.qimg.copy(img.left, 0, img.right - img.left, img.height)
         if img.path.lower().endswith('jpg') or img.path.lower().endswith('jpeg'):
-          copy.save(os.path.join(dir_path, img.path), format='JPG', quality=95)
+          copy.save(os.path.join(dir_path, img.path), format='JPG', quality=self.quality)
         else:
           copy.save(os.path.join(dir_path, img.path))
         img.clear()

@@ -1,8 +1,9 @@
 import os
+from typing import Optional
 
 from PySide6.QtWidgets import QApplication, QFileDialog, QMainWindow
 
-from cropper.models.file_manager import Load, Save
+from cropper.models.file_manager import Load, Save, StopThread
 from cropper.models.image import Image
 from cropper.views.main_view_ui import Ui_MainWindow
 
@@ -14,7 +15,7 @@ class MainView(QMainWindow):
     self.ui.setupUi(self)
     self.images = []
     self.dir_path = None
-    self.thread = None
+    self.thread: Optional[StopThread] = None
 
     self.ui.action_exit.triggered.connect(QApplication.quit)
     self.ui.action_open.triggered.connect(self.file_open)
@@ -35,7 +36,11 @@ class MainView(QMainWindow):
     self.thread = Load(file_name[0])
     self.thread.page_ready.connect(self.update_pages)
     self.thread.start()
-    self.thread.finished.connect(lambda: self.ui.save_button.setEnabled(True))
+    self.thread.finished.connect(self.after_load)
+
+  def after_load(self):
+    self.ui.save_button.setEnabled(True)
+    self.thread = None
 
   def save(self):
     file_name = QFileDialog.getSaveFileName(self, "Save comic", self.dir_path, "Comic files (*.cbz)")[0]
@@ -62,3 +67,8 @@ class MainView(QMainWindow):
     if img.path.endswith('jpg') or img.path.endswith('jpeg'):
       self.ui.jpg_quality_label.setVisible(True)
       self.ui.jpg_quality_box.setVisible(True)
+
+  def closeEvent(self, event, /):
+    if self.thread:
+      self.thread.stop = True
+      self.thread.wait()

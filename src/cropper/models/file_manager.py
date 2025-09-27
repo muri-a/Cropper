@@ -12,7 +12,13 @@ from PySide6.QtGui import QImage
 from cropper.models.image import Image
 
 
-class Load(QThread):
+class StopThread(QThread):
+  def __init__(self):
+    super().__init__()
+    self.stop = False
+
+
+class Load(StopThread):
   page_ready = Signal(Image)
 
   def __init__(self, comic_path: str):
@@ -24,6 +30,8 @@ class Load(QThread):
       for path in arch.namelist():
         if path.endswith('/'):
           continue
+        if self.stop:
+          return
         img_data = arch.read(path)
         if not img_data:
           continue
@@ -80,7 +88,7 @@ class Load(QThread):
     img.right = right
 
 
-class Save(QThread):
+class Save(StopThread):
   def __init__(self, path: str, images: List[Image], quality: int = 95):
     super().__init__()
     self.path = path
@@ -110,6 +118,10 @@ class Save(QThread):
         else:
           copy.save(os.path.join(dir_path, img.path))
         img.clear()
+
+      if self.stop:
+        shutil.rmtree(dir_path, ignore_errors=True)
+        return
 
     os.chdir(dir_path)  # So ZipFile works properly
     with ZipFile(self.path, 'w') as zip:

@@ -20,6 +20,7 @@ class StopThread(QThread):
 
 class Load(StopThread):
   page_ready = Signal(Image)
+  max_margin = 0.2
 
   def __init__(self, comic_path: str):
     super().__init__()
@@ -51,7 +52,6 @@ class Load(StopThread):
         pixel = qimg.pixel(col, y)
         # Convert pixel to [0-1] float
         pixel = 1 - (((pixel & 0xFF) + ((pixel & 0xFF00) >> 8) + ((pixel & 0xFF0000) >> 16)) / 765) # 3 * 0xff
-        # print(pixel, pixel ** 2)
         pixel **= 2
         dark_sum += pixel
         if dark_sum > threshold:
@@ -69,16 +69,16 @@ class Load(StopThread):
       return
     right = self.margin(img.qimg, -1)
 
-    limit = 0.2 * img.width # Max 20% of page can be margin
-    whole = img.width - right + left
+    limit = self.max_margin * img.width # Max 20% of page can be margin
+    whole = img.width - 1 - right + left
 
     if whole > limit:
       over = whole - limit
       if left < over / 2:
         right += floor(over - left)
         left = 0
-      elif img.width - right < over:
-        left -= floor(over - img.width + right)
+      elif img.width - 1 - right < over / 2:
+        left -= floor(over - img.width + 1 + right)
         right = img.width - 1
       else:
         left -=  floor(over / 2)
@@ -117,7 +117,7 @@ class Save(StopThread):
           copy.save(os.path.join(dir_path, img.path), format='JPG', quality=self.quality)
         else:
           copy.save(os.path.join(dir_path, img.path))
-        img.clear()
+      img.clear()
 
       if self.stop:
         shutil.rmtree(dir_path, ignore_errors=True)
